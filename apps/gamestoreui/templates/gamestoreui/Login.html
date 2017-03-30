@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#loginCtrl").hide();
+            var type = 0;
+            $('#btnDevLogin').click(function () {
+                $("#btnDevLogin").hide();
+                $("#btnUserLogin").hide();
+                $("#btnCreateDev").hide();
+                $("#btnCreateUser").hide();
+
+                $("#lblHeading").html("<h1>Developer Login</h1>");
+                $("#loginCtrl").show();
+                $("#tbl_Games_wrapper").hide();
+            });
+
+            $('#btnUserLogin').click(function () {
+                $("#btnDevLogin").hide();
+                $("#btnUserLogin").hide();
+                $("#btnCreateDev").hide();
+                $("#btnCreateUser").hide();
+
+                $("#lblHeading").html("<h1>User Login</h1>");
+                $("#loginCtrl").show();
+                type = 1;
+                $("#tbl_Games_wrapper").hide();
+            });
+
+            $('#btnCreateDev').click(function () {
+                location.href = "/registerDevelopers/";
+            })
+
+            $('#btnCreateUser').click(function () {
+
+                location.href = "/registerUsers/";
+            })
+
+            $("#btnLogin").click(function () {
+
+                var userName = $("#txtUserName").val();
+                var password = $("#txtPassword").val();
+
+                $.ajax({
+                  type:"POST",
+                   url: "../LoginUser/",
+                   datatype: "json",
+                   data: ({
+                           userName: userName,
+                           password: password,
+                           type : type
+                    }),
+                   success: function(data){
+
+                       if(data == 1)
+                       {
+                           location.href = "/GameStore/";
+                       }
+                       else{
+                           alert("Please enter valid user name and password");
+                       }
+
+                   }
+                });
+
+
+            })
+
+            $("#tbl_Games").DataTable({
+
+                "ajax": {
+                    "processing": true,
+                    "url": "../LoadGames/",
+                    "dataSrc": ""
+                        },
+                "columns": [
+                         { "data": "fields.name","autoWidth": true },
+                         { "data": "fields.price","autoWidth": true },
+                         { "data": null,"autoWidth": true }
+
+
+                ],
+                "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                    $('td:eq(2)', nRow).html('<button type="button" onClick="view('+ "'" + aData.fields.gameURL + "'" + "," + "'" + aData.fields.name + "'" +')" class="btn btn-info">View</button>');
+
+                    }
+            });
+      });
+
+        function view(gamesURL,name) {
+         $("#GameModal").modal('show');
+         $("#modalBody").html("");
+         $('h4.modal-title').text(name);
+         $("#modalBody").append("<iframe style='height: 100%;width: 100%' src = " + gamesURL + "> </iframe>");
+      }
+    </script>
+
+</head>
+<body>
+<br/>
+    <div style="text-align: right;margin-right: 1%">
+      <button type="button" id="btnCreateDev" class="btn btn-info">Create Developer</button>
+      <button type="button" id="btnCreateUser" class="btn btn-warning">Create User</button>
+    </div>
+<br/>
+<label id="lblHeading" ><h1>Login Page</h1></label>
+<br/>
+<br/>
+<button type="button" id="btnDevLogin" class="btn btn-primary">Developer Login</button>
+<button type="button" id="btnUserLogin" class="btn btn-success">User Login</button>
+
+<div class="form-group">
+    <div id="loginCtrl" style="margin: auto">
+    <div class="row">
+        <div class="col-lg-2">
+           <label for="userName">User Name:</label>
+           <input type="UserName" class="form-control" id="txtUserName">
+         </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-lg-2">
+           <label for="txtPassword">Password:</label>
+           <input type="Password" class="form-control" id="txtPassword">
+        </div>
+    </div>
+    <br/>
+    <button type="button" id="btnLogin" class="btn btn-success">Login</button>
+    </div>
+</div>
+
+<table id="tbl_Games" class="display">
+
+    <thead>
+    <tr>
+        <th style="width: 40%">Name</th>
+        <th style="width: 40%">Price</th>
+        <th style="width: 20%">Actions</th>
+    </tr>
+    </thead>
+
+</table>
+
+<div class="modal fade" id="GameModal" role="dialog">
+    <div style="width: 85%;height: 130%" class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content" style="margin-top: 5%;height: 65%">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 id="modalTitle" class="modal-title"></h4>
+        </div>
+        <div style="height: 77%;" id="modalBody" class="modal-body">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
